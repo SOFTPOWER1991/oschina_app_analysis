@@ -24,9 +24,9 @@ class ExampleActivity extends Activity {
   }
 }
 ```
-代替缓慢的反射，代码通常表现的跟View看起来的样子。调用bind委托这些代码你可以看到和debug.
+代替缓慢的反射，代码通常表现的跟View看起来的样子。调用bind委托这些通用的代码你可以看到和debug.
 
-上面的例子生成的代码大概跟下面的一样：
+上面的例子中的通用代码生成的代码大概是下面的样子：
 
 ```
 public void bind(ExampleActivity activity) {
@@ -36,7 +36,7 @@ public void bind(ExampleActivity activity) {
 }
 ```
 
-##NON-ACTIVITY BINDING 非Activity绑定
+##NON-ACTIVITY BINDING（对inflate得来的View进行绑定）
 
 你也可以绑定在自定义对象上来支持你自己的view root。
 
@@ -53,7 +53,7 @@ public class FancyFragment extends Fragment {
   }
 }
 ```
-##VIEW HOLDER BINDING 对View Holder 进行绑定
+##对View Holder 进行绑定
 
 ```
 public class MyAdapter extends BaseAdapter {
@@ -84,15 +84,15 @@ public class MyAdapter extends BaseAdapter {
 }
 ```
 
-你可以看到这些实践在提供的例子中。
+你可以上述提供的例子中看到这些技巧的具体应用：
 
-调用ButterKnife.bind可以在任何地方使用否则调用findViewById.
+你可以在任何地方调用ButterKnife.bind而不是调用findViewById.
 
-其它的已经提供的绑定API：
+其它的已提供的绑定API：
 
-绑定主观对象，使用Activity作为view根节点。如果你用的模式像MVC是可以用它的Activity绑定控制器，借助ButterKnife.bing(this , activity).
+绑定自定义对象，使用一个Activity作为view根节点。如果你使用了像MVC这样的模式你可以使用它的Activity来绑定控制器，借助 ButterKnife.bing(this , activity).
 
-绑定一个view的孩子到字段使用ButterKnife.bind(this).如果你用了<merge>节点在你的布局里或者inflate了自定义view的构造方法你可以立刻调用此方法。或者，从XML反射的自定义view类型可以使用它在onFinishInflate回调方法中。
+使用ButterKnife.bind(this)绑定一个view的子节点字段.如果你用了<merge>节点在你的布局里或者自定义view的构造方法里使用了inflate,你可以立刻调用此方法。或者，从XML反射的来的自定义view类型可以使用它在onFinishInflate回调方法中。
 
 ##VIEW LISTS
 你可以组织复杂的views到一个list或者array中。
@@ -102,7 +102,7 @@ public class MyAdapter extends BaseAdapter {
 List<EditText> nameViews;
 ```
 
-`apply`方法允许你立即采取行动对在list中的所有view.
+`apply`方法允许你对在list中的所有view进行操作.
 
 ```
 ButterKnife.apply(nameViews, DISABLE);
@@ -124,7 +124,7 @@ static final ButterKnife.Setter<View, Boolean> ENABLED = new ButterKnife.Setter<
 };
 ```
 
-Android的`Property`（配置信息）也可以被用在`apply`方法中。
+Android的`Property`（配置信息）也可以被用在`apply`方法中，作为`apply`方法的参数。
 
 ```
 ButterKnife.apply(nameViews, View.ALPHA, 0.0f);
@@ -160,7 +160,7 @@ public void sayHi(Button button) {
 }
 ```
 
-为通用事件操作在一个单独的绑定中声明多个ID
+对通用事件操作时在一个单独的绑定中声明多个ID
 
 ```
 @OnClick({ R.id.door1, R.id.door2, R.id.door3 })
@@ -185,7 +185,7 @@ public class FancyButton extends Button {
 ```
 
 ##BINDING RESET
-Fragment和Activity相比有不同的生命周期。当在一个Fragment的onCreateView中绑定的时候，在onDestoryView中设置Views为null。Butter Knife 有一个 unbind 方法来自动的做这件事。
+Fragment和Activity相比有不同的生命周期。当在一个Fragment的onCreateView中绑定的时候，需要在onDestoryView中设置Views为null。但是，Butter Knife 有一个 unbind 方法来自动的做这件事。
 
 ```
 public class FancyFragment extends Fragment {
@@ -209,7 +209,7 @@ public class FancyFragment extends Fragment {
 ##OPTIONAL BINDINGS 
 默认情况下，@Bind 和 监听器的绑定都是必须的。如果目标view没有被找到的话一个异常将会被抛出。
 
-为了镇压这个表现和创建一个可选择的绑定，为字段或者是方法添加一个@Nullable注解
+为了压制这个表现和创建一个可选择的绑定，为字段或者是方法添加一个@Nullable注解
 
 注意：任何名字为@Nullable的注解可以被这样使用。鼓励你使用Android自己的注解库"support-annotations"中的@Nullable注解，参见[Android Tools Project](http://tools.android.com/tech-docs/support-annotations).
 
@@ -284,16 +284,16 @@ packagingOptions {
 }
 ```
 ##IDE CONFIGURATION
-一些IDE需要额外的配置为了是注解进程能够使用
+一些IDE需要额外的配置为了使注解能够使用
 
-* IntelliJ IDEA —— 如果你的工程使用了额外的配置（比如 Maven 的 pom.xml）那么annotation 进程需要仅仅工作。如果没有，试试 [manual configuration](http://jakewharton.github.io/butterknife/ide-idea.html)
+* IntelliJ IDEA —— 如果你的工程使用了额外的配置（比如 Maven 的 pom.xml）那么annotation 进程就可以工作了。如果没有，试试 [manual configuration](http://jakewharton.github.io/butterknife/ide-idea.html)
 * Eclipse —— 设置 [manual configuration](http://jakewharton.github.io/butterknife/ide-eclipse.html)
 
 ##PROGUARD
 
-Butter Knife 动态的生成和使用class，这意味着静态的分析工具像ProGuard可能会认为这是毋庸的。为了阻止他们被移除，明确的标明他们将要被保持。为了阻止ProGuard 重命名class因此使用@Bind在一个成员变量，因此keepclasseswithmembernames 选项被使用了。
+Butter Knife 动态的生成和使用class，这意味着静态的分析工具像ProGuard可能会认为这是无用的。为了阻止他们被移除，明确的标明他们将要被保持。为了阻止ProGuard 重命名class，在该class中使用了@Bind来注解一个成员变量，因此需要使用keepclasseswithmembernames 。
 
-混淆时代码如下
+混淆代码如下
 
 ```
 -keep class butterknife.** { *; }
